@@ -3,8 +3,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:green_environment/GreenCommunity/comment.dart';
 import 'package:green_environment/GreenCommunity/like_button.dart';
-import 'package:green_environment/GreenCommunity/total_comments.dart';
-import 'package:http/http.dart';
 import '../DateTimeFormat/date_time.dart';
 import '../services/chatting_page.dart';
 import 'delete_posts_button.dart';
@@ -217,7 +215,7 @@ Future<void> totalComments(String id) async {
                 .delete()
                 .then((value) => print("Post Deleted"))
                 .catchError(
-                    (error) => print("Faileds to delete post: $error"));
+                    (error) => print("Failed to delete post: $error"));
 //close the dialog box
           Navigator.pop(context);
             },
