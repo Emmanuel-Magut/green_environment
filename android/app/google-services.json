@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "672373891733",
+    "project_id": "greenenvironment-5929a",
+    "storage_bucket": "greenenvironment-5929a.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:672373891733:android:3c33b32d2f42a9a861f19c",
+        "android_client_info": {
+          "package_name": "com.example.green_environment"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDLoBKi1-zgwA2CjMBsDzl34lJU61UoUoc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
