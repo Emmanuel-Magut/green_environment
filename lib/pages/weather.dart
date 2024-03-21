@@ -261,7 +261,7 @@ class _ShowWeatherState extends State<ShowWeather> {
   }
 }
 
-const OPENWEATHER_API_KEY = '4f6af137873981bb45889bf0d3c913a7';
+
 
 
 
@@ -282,7 +282,7 @@ const OPENWEATHER_API_KEY = '4f6af137873981bb45889bf0d3c913a7';
 }
 
 class _WeatherState extends State<WeatherWidget> {
-  final _weatherService = WeatherService('4f6af137873981bb45889bf0d3c913a7');
+  
   Weather? _weather;
 
   // Fetch weather
