@@ -1,16 +1,3 @@
 # green_environment
 
-A new Flutter project.
-
-## Getting Started
-
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+Climate change is a risk global challenge that has been the talk of the day for the past decades. This is a central platform that brings people together and create awareness on the effects of climate change and measures to take in order to help reduce these effects both at an individual and collective level. The app acts as a repository to a wealth of educative, content, resources, magazines, and articles. The objective of these app is mainly to create awareness, a community engagement platform for people to share ideas, progress tracking to track activities such as the number of trees planted, and the amount of garbage collected. The app also will enable different organizations and stakeholders to post events such as tree planting and garbage collection days which are the activities that contributes positively to keeping our environment clean therefore reaching out to large number of individuals.
