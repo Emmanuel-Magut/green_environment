@@ -18,8 +18,7 @@ class _MpesaDonationsState extends State<MpesaDonations> {
   void initState() {
     super.initState();
     // Initialize the MpesaFlutterPlugin
-    MpesaFlutterPlugin.setConsumerKey('xuQEiJoIYczCr4IRPsC1WdGNtwFBgIAIK5AEZms3hyWicoog');
-    MpesaFlutterPlugin.setConsumerSecret('FGuaA8eZ7HiK7TihW3UYkV3HvwL9gw7HEhCWU7PXbgKVaWAdPQzx2Kfl8C6cx5BF');
+    
   }
 
   // Function to validate the phone number
