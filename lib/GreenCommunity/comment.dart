@@ -56,11 +56,30 @@ class _CommentsState extends State<Comments> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text("Reply"),
-        content: TextField(
-          controller: _reply1TextController,
-          decoration: const InputDecoration(
-            hintText: "Reply ...",
+        title: const Center(
+            child: Text("Reply",
+              style: TextStyle(
+                fontFamily: 'Georgia',
+              ),
+            )
+        ),
+        content: Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: Colors.green,
+            ),
+          ),
+          child: TextField(
+            cursorColor: Colors.green,
+            maxLines: 4,
+            controller: _reply1TextController,
+            decoration: const InputDecoration(
+              border: OutlineInputBorder(
+                borderSide: BorderSide.none,
+              ),
+              hintText: "Reply ...",
+            ),
           ),
         ),
         actions: [
@@ -69,7 +88,20 @@ class _CommentsState extends State<Comments> {
               Navigator.pop(context);
               _reply1TextController.clear();
             },
-            child: const Text("Cancel"),
+            child: Container(
+              padding: const EdgeInsets.all(6),
+             decoration: BoxDecoration(
+                color: Colors.green,
+                borderRadius: BorderRadius.circular(12),
+
+              ),
+                child: const Text("Cancel",
+                style:TextStyle(
+                  color: Colors.white,
+                  fontSize:20,
+                )
+                )
+            ),
           ),
           TextButton(
             onPressed: () {
@@ -77,7 +109,19 @@ class _CommentsState extends State<Comments> {
               _reply1TextController.clear();
               Navigator.pop(context);
             },
-            child: const Text("Comment"),
+            child: Container(
+              padding: const EdgeInsets.all(6),
+                decoration: BoxDecoration(
+                  color: Colors.green,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Text("Reply",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 20,
+                  ),
+                ),
+            ),
           ),
         ],
       ),

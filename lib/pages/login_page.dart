@@ -1,12 +1,10 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:green_environment/pages/change_password.dart';
 import 'package:green_environment/pages/my_text_field.dart';
-import 'package:green_environment/pages/onboarding_page.dart';
 import 'package:green_environment/pages/tile.dart';
 import 'package:green_environment/pages/weather.dart';
 import 'package:provider/provider.dart';
-
-
 import '../services/auth_service.dart';
 import 'my_button.dart';
 
@@ -58,12 +56,7 @@ class _LoginPageState extends State<LoginPage> {
     }
 
   }
-
-
-
-
   //error message
-
   void showErrorMessage(String message){
     showDialog(context: context, builder:(context){
       return AlertDialog(
@@ -148,7 +141,7 @@ class _LoginPageState extends State<LoginPage> {
                       mainAxisAlignment:MainAxisAlignment.end ,
                       children: [
                         GestureDetector(
-                          onTap: () {},
+                          onTap: () => const ForgotPasswordPage(),
                           child: const Text('Forgot Password?',
                             style: TextStyle(
                               color: Colors.blue,

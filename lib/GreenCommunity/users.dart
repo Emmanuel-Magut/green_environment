@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-
 import '../services/chatting_page.dart';
 
 class Users extends StatefulWidget {
@@ -12,6 +11,13 @@ class Users extends StatefulWidget {
 }
 
 class _UsersState extends State<Users> {
+  @override
+  void initState() {
+    super.initState();
+    // Call setUserOnlineStatus(true) when the user logs in
+    setUserOnlineStatus(true);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -48,7 +54,7 @@ class _UsersState extends State<Users> {
 
     if (FirebaseAuth.instance.currentUser?.email != data['email']) {
       return GestureDetector(
-        onTap: () => _showUserDetailsDialog(context, data), // Open dialog on tap
+        onTap: () => _showUserDetailsDialog(context, data),
         child: Padding(
           padding: const EdgeInsets.only(left: 5, right: 5),
           child: Material(
@@ -57,39 +63,71 @@ class _UsersState extends State<Users> {
             child: Column(
               children: [
                 Container(
-                  height: 100, // Adjust the height of the circular image
-                  width: 100, // Adjust the width of the circular image
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(40), // Half of the width/height for a circle
-                    child: data['profileImage'] != null && data['profileImage'] != ''
-                        ? Image.network(
-                      data['profileImage'],
-                      width: 100,
-                      height: 100,
-                      fit: BoxFit.cover,
-                    )
-                        : Container(
-                      padding: const EdgeInsets.all(5),
-                      color: Colors.grey, // Background color if no image
-                      child: const Icon(Icons.person, size: 100, color: Colors.white), // Fallback Icon
-                    ),
+                  height: 100,
+                  width: 100,
+                  child: Stack(
+                    children: [
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(40),
+                        child: data['profileImage'] != null && data['profileImage'] != ''
+                            ? Image.network(
+                          data['profileImage'],
+                          width: 100,
+                          height: 100,
+                          fit: BoxFit.cover,
+                        )
+                            : Container(
+                          padding: const EdgeInsets.all(5),
+                          color: Colors.grey,
+                          child: const Icon(Icons.person, size: 100, color: Colors.white),
+                        ),
+                      ),
+                      if (data['isOnline'] ?? false)
+                        Positioned(
+                          bottom: 0,
+                          right: 0,
+                          child: Container(
+                            width: 10,
+                            height: 10,
+                            decoration: BoxDecoration(
+                              border: Border.all(
+                                color: Colors.grey.shade400,
+
+                              ),
+                              color: Colors.lightGreen,
+                              shape: BoxShape.circle,
+                            ),
+                          ),
+                        ),
+                    ],
                   ),
                 ),
-                const SizedBox(height: 5), // Add spacing between image and username
-                Text(data['username'] ?? '',
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16,
+                const SizedBox(height: 5),
+                Text(
+                  data['username'] ?? '',
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                  ),
                 ),
-                ),
+                const SizedBox(height: 2),
               ],
             ),
           ),
         ),
-
       );
     } else {
       return Container();
+    }
+  }
+
+  void setUserOnlineStatus(bool isOnline) async {
+    // Get the current user's UID
+    String? uid = FirebaseAuth.instance.currentUser?.uid;
+
+    if (uid != null) {
+      // Update the isOnline field in Firestore
+      await FirebaseFirestore.instance.collection('users').doc(uid).update({'isOnline': isOnline});
     }
   }
 
@@ -110,8 +148,6 @@ class _UsersState extends State<Users> {
                 height: 80,
               ),
               Text(userData['email']),
-              // ... Add other detailss as needed
-
 
             ],
           ),
@@ -128,7 +164,6 @@ class _UsersState extends State<Users> {
                       receiverUserEmail: userData['email'],
                       receiverUserID: userData['uid'],
                       receiverUsername: userData['username'],
-
                     ),
                   ),
                 );

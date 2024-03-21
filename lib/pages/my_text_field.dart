@@ -7,7 +7,8 @@ class MyTextField extends StatelessWidget{
   final obscureText;
   final FocusNode? focusNode;
   final maxLines;
-  const MyTextField({
+
+  const MyTextField({super.key,
     required this.hintText,
     required this.controller,
     required this.obscureText,
@@ -22,12 +23,12 @@ class MyTextField extends StatelessWidget{
         obscureText: obscureText,
         controller: controller,
         decoration: InputDecoration(
-          enabledBorder: OutlineInputBorder(
+          enabledBorder: const OutlineInputBorder(
             borderSide: BorderSide(
               color:Colors.white,
             ),
           ),
-          focusedBorder: OutlineInputBorder(
+          focusedBorder: const OutlineInputBorder(
             borderSide: BorderSide(
               color: Colors.green,
             ),

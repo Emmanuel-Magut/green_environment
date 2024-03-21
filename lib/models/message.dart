@@ -8,7 +8,7 @@ class Message{
   final String senderUserprofile;
   final String userName;
   final Timestamp timestamp;
-
+  final bool isRead;
   Message({
     required this.senderId,
     required this.senderEmail,
@@ -17,7 +17,7 @@ class Message{
     required this.timestamp,
     required this.senderUserprofile,
     required  this.userName,
-
+    required this.isRead,
 });
 
   //convert to a map because that is how info is stored in firebase
@@ -30,6 +30,7 @@ class Message{
      'receiverId' : receiverId,
      'message' : message,
      'timestamp': timestamp,
+     'isRead': isRead,
    };
   }
 

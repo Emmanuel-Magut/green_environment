@@ -19,20 +19,21 @@ class Onboard extends StatelessWidget {
       body: Container(
         color: color,
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+
           children: [
           Image.asset(
             imagePath,
+
             fit: BoxFit.cover,
             width: double.infinity,
           ),
-            SizedBox(height:70),
+            const SizedBox(height:40),
 
             Container(
-              padding: EdgeInsets.symmetric(horizontal: 25),
+              padding: const EdgeInsets.symmetric(horizontal: 25),
               child: Text(
                 title,
-                style: TextStyle(
+                style: const TextStyle(
                   color: Colors.white,
                   fontSize:32,
                   fontWeight: FontWeight.bold,
@@ -40,12 +41,12 @@ class Onboard extends StatelessWidget {
                 ),
               ),
             ),
-            SizedBox(height: 24),
+            const SizedBox(height: 40),
             Container(
               padding: const EdgeInsets.symmetric(horizontal:25),
               child:Text(
                 subtitle,
-                style: TextStyle(
+                style: const TextStyle(
                   color: Colors.white,
                   fontSize: 20,
                 ),

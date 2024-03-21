@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
+import 'package:green_environment/GreenCommunity/inbox.dart';
 import 'package:green_environment/GreenCommunity/post_image.dart';
 import 'package:green_environment/GreenCommunity/posts.dart';
 import 'package:green_environment/GreenCommunity/posts_input_field.dart';
@@ -20,8 +22,10 @@ class GreenCommunity extends StatefulWidget {
 class _GreenCommunityState extends State<GreenCommunity> {
   final currentUser = FirebaseAuth.instance.currentUser!;
   final textController = TextEditingController();
-  //pop up for user to post something
+  //hidden navigationBar
+  bool isNavigationBarVisible = false;
 
+  //pop up for user to post something
   void saySomething() {
     showDialog(
       context: context,
@@ -30,9 +34,9 @@ class _GreenCommunityState extends State<GreenCommunity> {
           child: Column(
             children: [
               Text('Add Post',
-              style: TextStyle(
-                fontFamily: 'Georgia',
-              ),
+                style: TextStyle(
+                  fontFamily: 'Georgia',
+                ),
               ),
               Row(
                 children: [
@@ -41,9 +45,9 @@ class _GreenCommunityState extends State<GreenCommunity> {
                     size: 18,
                   ),
                   Text('Post only content related to climate change and environment.',
-                  style: TextStyle(
-                    fontSize: 12,
-                  ),
+                    style: TextStyle(
+                      fontSize: 12,
+                    ),
                   ),
                 ],
               ),
@@ -114,11 +118,10 @@ class _GreenCommunityState extends State<GreenCommunity> {
                 borderRadius: BorderRadius.circular(12),
               ),
               child: const Text('Cancel',
-              style: TextStyle(
-                fontSize: 18,
-                color: Colors.white,
-
-              ),
+                style: TextStyle(
+                  fontSize: 18,
+                  color: Colors.white,
+                ),
               ),
             ),
           ),
@@ -173,6 +176,7 @@ class _GreenCommunityState extends State<GreenCommunity> {
             children: [
               Expanded(
                 child: SingleChildScrollView(
+                  controller:  _scrollController,
                   child: Column(
                     children: [
                       Padding(
@@ -196,18 +200,18 @@ class _GreenCommunityState extends State<GreenCommunity> {
                             ),
 
 
-                             Column(
+                            Column(
                               children: [
                                 IconButton(
                                   onPressed: () {
                                     Navigator.push(
-                                      context,
-                                      MaterialPageRoute(builder: (context) => PostImage())
+                                        context,
+                                        MaterialPageRoute(builder: (context) => PostImage())
                                     );
                                   },
                                   icon: const Icon(Icons.photo,
-                                  size: 30,
-                                  color: Colors.green),
+                                      size: 30,
+                                      color: Colors.green),
                                 ),
                                 const Text("Image",
                                   style: TextStyle(
@@ -218,9 +222,17 @@ class _GreenCommunityState extends State<GreenCommunity> {
                                 ),
                               ],
                             ),
-                            const Icon(Icons.message_rounded,
-                              size: 30,
-                              color: Colors.green,
+                            GestureDetector(
+                              onTap: () {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(builder: (context) => InboxScreen())
+                                );
+                              },
+                              child: Icon(Icons.message_rounded,
+                                size: 30,
+                                color: Colors.green,
+                              ),
                             ),
                           ],
                         ),
@@ -251,7 +263,7 @@ class _GreenCommunityState extends State<GreenCommunity> {
                               itemBuilder: (context, index) {
                                 final post = snapshot.data!.docs[index];
                                 String email = post['UserEmail'];
-
+                                //perform internal query to get other details of the person who posted
                                 Stream<QuerySnapshot> userStream = FirebaseFirestore.instance
                                     .collection("users")
                                     .where("email", isEqualTo: email)
@@ -272,65 +284,68 @@ class _GreenCommunityState extends State<GreenCommunity> {
                                         uid   = userSnapshot.data!.docs[0].get("uid");
                                         email = userSnapshot.data!.docs[0].get("email");
                                       }
+
                                       return WallPosts(
-                                        commentId: post.id,
+                                          commentId: post.id,
                                           image: image,
                                           message: post['message'],
                                           userEmail: post['UserEmail'],
                                           postImage: post['imagePost'] != null ? post['imagePost'] : null,
                                           user: username,
-                                        profession: profession,
-                                        time: formatDate(post['TimeStamp']),
-                                        id: post.id,
-                                        likes: List<String>.from(post['Likes'] ?? []),
+                                          profession: profession,
+                                          time: formatDate(post['TimeStamp']),
+                                          id: post.id,
+                                          likes: List<String>.from(post['Likes'] ?? []),
                                           onTap:
                                               ()async {
-                                          // Option 1: Show Dialog
-                                       showDialog(
-                                           context: context,
-                                           builder: (context) => AlertDialog(
-                                             title: Text(username),
-                                             content: Column(
-                                               mainAxisSize: MainAxisSize.min, // Prevent content scrolling
-                                               children: [
-                                                 CircleAvatar(
-                                                   radius: 30,
-                                                   backgroundImage: NetworkImage(image),
-                                                 ),
-                                                 SizedBox(height: 10),
-                                                 Text(username), // Show both username and email
-                                               ],
-                                             ),
-                                             actions: [
-                                               TextButton(
-                                                 onPressed: () => Navigator.pop(context),
-                                                 child: const Text("Close"),
-                                               ),
-                                             //  if (widget. == currentUser.uid)
-                                                 TextButton(
-                                                   onPressed: () {
-                                                     // Handle the action when the button is pressed
-                                                     // Navigate to ChattingPage and send message (implementation needed)
-                                                     Navigator.push(
-                                                       context,
-                                                       MaterialPageRoute(
-                                                         builder: (context) => ChattingPage(
-                                                           // Pass user data and message
-                                                           receiverUserEmail: post['UserEmail'],
-                                                           receiverUserID: uid,
-                                                           receiverUsername: username,
-                                                         ),
-                                                       ),
-                                                     );
-                                                   },
-                                                   child: const Text('Send message'),
-                                                 ),
-                                             ],
+                                            // Option 1: Show Dialog
+                                            showDialog(
+                                              context: context,
+                                              builder: (context) => AlertDialog(
+                                                title: Text(username),
+                                                content: Column(
+                                                  mainAxisSize: MainAxisSize.min, // Prevent content scrolling
+                                                  children: [
+                                                    CircleAvatar(
+                                                      radius: 30,
+                                                      backgroundImage: NetworkImage(image),
+                                                    ),
+                                                    SizedBox(height: 10),
+                                                    Text(username), // Show both username and email
+                                                  ],
+                                                ),
+                                                actions: [
+                                                  TextButton(
+                                                    onPressed: () => Navigator.pop(context),
+                                                    child: const Text("Close"),
+                                                  ),
+                                                  //  if (widget. == currentUser.uid)
+                                                  TextButton(
+                                                    onPressed: () {
+                                                      // Handle the action when the button is pressed
+                                                      // Navigate to ChattingPage and send message (implementation needed)
+                                                      Navigator.push(
+                                                        context,
+                                                        MaterialPageRoute(
+                                                          builder: (context) => ChattingPage(
+                                                            // Pass user data and message
+                                                            receiverUserEmail: post['UserEmail'],
+                                                            receiverUserID: uid,
+                                                            receiverUsername: username,
+                                                          ),
+                                                        ),
+                                                      );
+                                                    },
+                                                    child: const Text('Send message'),
+                                                  ),
+                                                ],
 
-                                           ),
-                                       );
-                                     }
-                                     );
+                                              ),
+
+                                            );
+                                          }
+
+                                      );
                                     } else if (userSnapshot.hasError) {
                                       return Text('Error: ${userSnapshot.error}');
                                     }
@@ -341,6 +356,7 @@ class _GreenCommunityState extends State<GreenCommunity> {
                                 );
                               },
                             );
+
                           } else if (snapshot.hasError) {
                             return Center(child: Text('Error: ${snapshot.error}'));
                           }
@@ -355,6 +371,88 @@ class _GreenCommunityState extends State<GreenCommunity> {
           ),
         ),
       ),
+      bottomNavigationBar: AnimatedContainer(
+        duration: const Duration(milliseconds: 0),
+        height: isNavigationBarVisible ? kBottomNavigationBarHeight : 0,
+        child: isNavigationBarVisible
+            ?  BottomAppBar(
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              GestureDetector(
+                onTap: (){
+                  Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(builder: (context) => HomePage())
+                  );
+                },
+                child: const Column(
+                  children: [
+                    Icon(Icons.home,
+                      size: 20,
+                      color: Colors.green,
+                    ),
+                    Text('Home',
+                      style: TextStyle(
+                        fontSize: 10,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const Column(
+                children: [
+                  Icon(Icons.newspaper,
+                    size: 20,
+                    color: Colors.green,
+                  ),
+                  Text('Climate News',
+                    style: TextStyle(
+                      fontSize: 10,
+                    ),
+                  )
+                ],
+              ),
+              const Column(
+                children: [
+                  Icon(Icons.notifications,
+                    size: 20,
+                    color:Colors.green,
+                  ),
+                  Text('Notifications',
+                    style: TextStyle(
+                      fontSize: 10,
+                    ),
+                  )
+                ],
+              ),
+            ],
+          ),
+        )
+            : null,
+      ),
+
     );
   }
+  //  ScrollControllers to monitor the scroll position
+  final ScrollController _scrollController = ScrollController();
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController.addListener(() {
+      setState(() {
+        // Hide or show the bottom navigation bar based on the scroll position
+        isNavigationBarVisible =
+            _scrollController.position.userScrollDirection == ScrollDirection.forward;
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
 }

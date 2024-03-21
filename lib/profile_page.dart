@@ -23,6 +23,16 @@ class _ProfilePageState extends State<ProfilePage> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final _formKey = GlobalKey<FormState>();
 
+  String? _selectedCounty;
+// List of counties
+  final List<String> counties = [
+    'Baringo', 'Bomet', 'Bungoma', 'Busia', 'Elgeyo Marakwet', 'Embu', 'Garissa',
+    'Homa Bay', 'Isiolo', 'Kajiado', 'Kakamega', 'Kericho', 'Kiambu', 'Kilifi', 'Kirinyaga',
+    'Kisii', 'Kisumu', 'Kitui', 'Kwale', 'Laikipia', 'Lamu', 'Machakos', 'Makueni', 'Mandera',
+    'Marsabit', 'Meru', 'Migori', 'Mombasa', 'Murang\'a', 'Nairobi', 'Nakuru', 'Nandi', 'Narok',
+    'Nyamira', 'Nyandarua', 'Nyeri', 'Samburu', 'Siaya', 'Taita Taveta', 'Tana River', 'Tharaka Nithi',
+    'Trans Nzoia', 'Turkana', 'Uasin Gishu', 'Vihiga', 'Wajir', 'West Pokot'
+  ];
   void completeProfile() {
     showDialog(
       context: context,
@@ -85,7 +95,30 @@ class _ProfilePageState extends State<ProfilePage> {
                     return null;
                   },
                 ),
-                SizedBox(height: 20),
+                // Dropdown for county selection
+                DropdownButtonFormField<String>(
+                  value: _selectedCounty,
+                  onChanged: (String? newValue) {
+                    setState(() {
+                      _selectedCounty = newValue;
+                    });
+                  },
+                  items: counties.map((String value) {
+                    return DropdownMenuItem<String>(
+                      value: value,
+                      child: Text(value),
+                    );
+                  }).toList(),
+                  decoration: InputDecoration(
+                    labelText: 'County', // Label for the dropdown
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please select a county.';
+                    }
+                    return null;
+                  },
+                ),
                 TextFormField(
                   controller: widget.professionController,
                   decoration: InputDecoration(
@@ -110,11 +143,13 @@ class _ProfilePageState extends State<ProfilePage> {
                       if (_formKey.currentState!.validate()) {
                         // Call the function to add user details to Firestore
                         addUserDetails(
+
                           user.uid,
                           widget.usernameController.text,
                           widget.genderController.text,
                           widget.residenceController.text,
                           widget.professionController.text,
+                          _selectedCounty!,
                         );
                         Navigator.pop(context); // Close the dialog
                       }
@@ -141,6 +176,7 @@ class _ProfilePageState extends State<ProfilePage> {
       String gender,
       String residence,
       String profession,
+      String county,
       ) async {
     await _firestore.collection('users').doc(uid).set(
       {
@@ -148,6 +184,7 @@ class _ProfilePageState extends State<ProfilePage> {
         'gender': gender,
         'residence': residence,
         'profession': profession,
+        'county': county,
       },
       SetOptions(merge: true),
     ).then((value) => {
@@ -302,7 +339,7 @@ class _ProfilePageState extends State<ProfilePage> {
             var gender = userData['gender'] as String?;
             var profession = userData['profession'] as String?;
             var residence = userData['residence'] as String?;
-
+            var county = userData['county'] as String?;
             return Container(
               padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 20),
               margin: const EdgeInsets.all(12),
@@ -353,6 +390,18 @@ class _ProfilePageState extends State<ProfilePage> {
                           color: Colors.green,
                         ),
                         if (residence != null) Text('Residence: $residence',
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 18,
+
+                          ),
+                        ),
+                    //county
+                        const Divider(
+                          thickness: 1,
+                          color: Colors.green,
+                        ),
+                        if (county != null) Text('County: $county',
                           style: const TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 18,

@@ -1,17 +1,14 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:green_environment/Donations/mpesa_donations.dart';
 import 'package:green_environment/GreenCommunity/green_community.dart';
-import 'package:green_environment/sections/nba.dart';
-import 'package:provider/provider.dart';
-
+import 'package:green_environment/pages/change_password.dart';
 import '../models/news.dart';
 import '../profile_page.dart';
-import '../services/auth_service.dart';
-import '../services/chat_page.dart';
 import '../services/profile_picture.dart';
 import 'home.dart';
-import 'login_page.dart';
+
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -22,20 +19,35 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  void logout() {
-    FirebaseAuth.instance.signOut();
+
+  void logout() async {
+    // Get the current user's UID
+    String? uid = FirebaseAuth.instance.currentUser?.uid;
+    if (uid != null) {
+      // Update the isOnline and lastSeen fields in Firestore before signing out
+      await FirebaseFirestore.instance.collection('users').doc(uid).update({
+        'isOnline': false,
+        'lastSeen': FieldValue.serverTimestamp(),
+      });
+    }
+    // Sign out the user
+    await FirebaseAuth.instance.signOut();
+
+
   }
 
-  final user = FirebaseAuth.instance.currentUser!;
 
+  final user = FirebaseAuth.instance.currentUser!;
 
   int _selectedIndex = 0;
 
   static const List<Widget> _widgetOptions = <Widget>[
     Home(),
-    Text('Donate'),
-    Text('Notifications'),
+    MpesaDonations(),
+
   ];
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -145,79 +157,75 @@ class _HomePageState extends State<HomePage> {
                 ],
               ),
             ),
-            ListTile(
-              leading: GestureDetector(
-                onTap: (){
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) =>  NBA()),
-                  );
-                },
-                child: Icon(
-                  Icons.home,
-                  color: Colors.green,
-                  size: 40,
-                ),
-              ),
-              title: Text('D A S H B O A R D'),
-            ),
-            ListTile(
-              leading: GestureDetector(
-                onTap: (){
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => News())
-                  );
-                },
-                child: Icon(
-                  Icons.chat,
-                  color: Colors.green,
-                  size: 40,
-                ),
-              ),
-              title: const Text('M E S S A G E'),
-            ),
 
-            ListTile(
-              leading: GestureDetector(
-                onTap: (){
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) =>  ProfilePage(),
+
+            Column(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Column(
+                  children: [
+                    GestureDetector(
+                      onTap: (){
+                        Navigator.pop(context);
+                      },
+                      child: const ListTile(
+                        leading: Icon(
+                          Icons.home,
+                          color: Colors.green,
+                          size: 40,
+                        ),
+                        title: Text('D A S H B O A R D'),
+                      ),
                     ),
-                  );
-                },
-                child: const Icon(
-                  Icons.person,
-                  color: Colors.green,
-                  size: 40,
+                    ListTile(
+                      leading: GestureDetector(
+                        onTap: (){
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) =>  ProfilePage(),
+                            ),
+                          );
+                        },
+                        child: const Icon(
+                          Icons.person,
+                          color: Colors.green,
+                          size: 40,
+                        ),
+                      ),
+                      title: const Text('P R O F I L E'),
+                    ),
+                    GestureDetector(
+                      onTap: (){
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => const ForgotPasswordPage()),
+                        );
+                      },
+                      child: const ListTile(
+                        leading: Icon(
+                          Icons.password_outlined,
+                          color: Colors.green,
+                          size: 40,
+                        ),
+                        title: Text('CHANGE PASSWORD'),
+                      ),
+                    ),
+
+                  ],
                 ),
-              ),
-              title: const Text('P R O F I L E'),
-            ),
-            ListTile(
-              leading: GestureDetector(
-                onTap: (){
-    Navigator.push(
-    context,
-    MaterialPageRoute(builder: (context) => ChatPage(),
-    ),
-    );
-    },
-                child: Icon(
-                  Icons.settings,
-                  color: Colors.green,
-                  size: 40,
+                ListTile(
+                  leading: IconButton(
+                    icon: const Icon(Icons.logout,
+                      color: Colors.green,
+                      size: 30,
+                    ),
+                    onPressed: () => logout(),
+                  ),
+                  title: const Text('L O G O U T'),
                 ),
-              ),
-              title: Text('S E T T I N G S'),
-            ),
-            ListTile(
-              leading: IconButton(
-                icon: const Icon(Icons.logout),
-                onPressed: () => logout(),
-              ),
-            ),
+              ],
+            )
+
 
           ],
         ),
@@ -245,18 +253,21 @@ class _HomePageState extends State<HomePage> {
             ),
             label: 'Green Community',
           ),
-          const BottomNavigationBarItem(
-            icon: Icon(Icons.monetization_on,
-              color: Colors.green,
+           BottomNavigationBarItem(
+            icon: GestureDetector(
+              onTap: (){
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder:(context)=> const MpesaDonations())
+                );
+              },
+              child: Icon(Icons.monetization_on,
+                color: Colors.green,
+              ),
             ),
             label: 'Donate',
           ),
-          const BottomNavigationBarItem(
-            icon: Icon(Icons.notifications,
-            color: Colors.green,
-            ),
-            label: 'Notifications',
-          ),
+
         ],
         currentIndex: _selectedIndex,
         selectedItemColor: Colors.grey,

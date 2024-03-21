@@ -3,9 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:green_environment/pages/home_page.dart';
 import 'package:green_environment/pages/login_or_register_page.dart';
-import 'package:green_environment/pages/onboarding_page.dart';
-import 'package:green_environment/pages/welcome_page.dart';
-import 'login_page.dart';
+import 'package:green_environment/pages/onboarding_screen.dart';
+
+
 
 class AuthPage extends StatelessWidget {
   const AuthPage({super.key});
@@ -18,7 +18,7 @@ class AuthPage extends StatelessWidget {
         builder:(context, snapshot){
           //user is logged in
           if (snapshot.hasData){
-            return const OnboardingPage();
+            return const OnboardingScreen();
           }
           // user is NOT logged in
           else {

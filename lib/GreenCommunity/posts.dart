@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:green_environment/GreenCommunity/comment.dart';
 import 'package:green_environment/GreenCommunity/like_button.dart';
+import 'package:http/http.dart';
 import '../DateTimeFormat/date_time.dart';
 import '../services/chatting_page.dart';
 import 'delete_posts_button.dart';
@@ -44,7 +45,9 @@ import 'delete_posts_button.dart';
 }
 
 class _WallPostsState extends State<WallPosts> {
-   //show mmore or less comments
+  bool isExpanded = false;
+  final _formKey = GlobalKey<FormState>();
+  //show mmore or less comments
   int maxCommentsToShow = 5;
   bool showAllComments = false;
 //hide add comments button
@@ -90,17 +93,18 @@ final _commentTextController = TextEditingController();
 
   //add a comment
 void addComment(String commentText){
-  //write the comments to firestore under the comments collection for the post
-  FirebaseFirestore.instance
-      .collection('Posts')
-      .doc(widget.id)
-      .collection("comments")
-      .add({
-       'commentText': commentText,
-       'commentedBy': currentUser.email,
-       'commentTime': Timestamp.now(),
-  });
-
+  if (_commentTextController.text.isNotEmpty) {
+    //write the comments to firestore under the comments collection for the post
+    FirebaseFirestore.instance
+        .collection('Posts')
+        .doc(widget.id)
+        .collection("comments")
+        .add({
+      'commentText': commentText,
+      'commentedBy': currentUser.email,
+      'commentTime': Timestamp.now(),
+    });
+  }
 }
 
 Future<void> totalComments(String id) async {
@@ -118,7 +122,7 @@ Future<void> totalComments(String id) async {
     int totalComments = querySnapshot.size;
 
   } catch (error) {
-    print('Error fetching total comments: $error');
+    print('Errors fetching total comments: $error');
     // Handle errors as needed
   }
 }
@@ -127,11 +131,39 @@ Future<void> totalComments(String id) async {
   //show a dialog box for adding comment
   void showCommentDialog(){
   showDialog(context: context, builder: (context) => AlertDialog(
-      title: const Text("Add Comment"),
-    content: TextField(
-     controller: _commentTextController,
-      decoration: const InputDecoration(
-        hintText: "Write a comment...",
+      title: Form(
+        key: _formKey,
+        child: const Center(
+          child: Text('Comment',
+            style: TextStyle(
+              fontFamily: 'Georgia',
+            ),
+          ),
+        ),
+      ),
+    content: Container(
+      width: MediaQuery.of(context).size.width,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: Colors.green,
+        )
+      ),
+      child: TextFormField(
+        maxLines: 6,
+       controller: _commentTextController,
+        decoration: const InputDecoration(
+          border: OutlineInputBorder(
+            borderSide: BorderSide.none,
+          ),
+          hintText: "Write a comment...",
+        ),
+        validator: (value) {
+          if (value!.isEmpty) {
+            return 'Comment cannot be empty';
+          }
+          return null;
+        },
       ),
     ),
     actions:  [
@@ -143,17 +175,43 @@ Future<void> totalComments(String id) async {
         // clear controller
         _commentTextController.clear();
         },
-        child: const Text("Cancel"),
+        child: Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(12),
+            color: Colors.green,
+          ),
+            child: const Text("Cancel",
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 20,
+            ),
+            )
+        ),
       ),
 
       TextButton(onPressed:() {
-        addComment(_commentTextController.text);
-        //clear controller
-        _commentTextController.clear();
-        //pop the box
-        Navigator.pop(context);
-        },
-        child: const Text("Comment"),
+    if (_formKey.currentState!.validate()) {
+    addComment(_commentTextController.text);
+    //clear controller
+    _commentTextController.clear();
+    //pop the box
+    Navigator.pop(context);
+    }
+    },
+        child: Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(12),
+            color: Colors.green,
+          ),
+            child: const Text("Comment",
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 20,
+              ),
+            ),
+        ),
       ),
     ],
   ),
@@ -228,6 +286,12 @@ Future<void> totalComments(String id) async {
   }
    @override
    Widget build(BuildContext context) {
+     String message = widget.message;
+     bool isMessageLong = message.split(' ').length > 40;
+     String displayMessage = isMessageLong
+         ? (isExpanded ? message : message.split(' ').take(40).join(' ') + '... ')
+         : message;
+
      return Container(
        margin: const EdgeInsets.only(top:6,bottom: 6),
        decoration:  const BoxDecoration(
@@ -307,13 +371,28 @@ Future<void> totalComments(String id) async {
 
                const SizedBox(height: 10),
                Padding(
-                 padding: const EdgeInsets.all(8.0),
-                 child: Text(widget.message,
+                 padding: const EdgeInsets.only(left:10,right: 10,bottom: 1),
+                 child: Text(
+                   displayMessage,
                    style: const TextStyle(
                      fontSize: 17,
                    ),
                  ),
                ),
+               if (isMessageLong)
+                 TextButton(
+                   onPressed: () {
+                     setState(() {
+                       isExpanded = !isExpanded;
+                     });
+                   },
+                   child: Text(
+                     isExpanded ? 'Read less' : 'Read more',
+                     style: const TextStyle(
+                       color: Colors.blue,
+                     ),
+                   ),
+                 ),
              ],
            ),
        Container(
